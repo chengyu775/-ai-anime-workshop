@@ -1,421 +1,400 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI工作流工坊</title>
-
-    <style>
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            margin: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-            background: #f5f5f7;
-            color: #222;
-        }
-
-        .header {
-            background: white;
-            padding: 20px;
-            border-bottom: 1px solid #ddd;
-            position: sticky;
-            top: 0;
-        }
-
-        .header h1 {
-            margin: 0;
-            font-size: 24px;
-        }
-
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 30px 20px;
-        }
-
-        .create-button {
-            width: 100%;
-            padding: 16px;
-            border: none;
-            border-radius: 12px;
-            background: #222;
-            color: white;
-            font-size: 16px;
-            cursor: pointer;
-            margin-bottom: 30px;
-        }
-
-        .create-button:active {
-            transform: scale(0.98);
-        }
-
-        .section-title {
-            font-size: 20px;
-            margin-bottom: 15px;
-        }
-
-        .workflow-list {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .workflow-card {
-            background: white;
-            border-radius: 16px;
-            padding: 20px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-        }
-
-        .workflow-card h3 {
-            margin: 0 0 8px 0;
-        }
-
-        .workflow-card p {
-            margin: 0 0 15px 0;
-            color: #777;
-        }
-
-        .card-buttons {
-            display: flex;
-            gap: 10px;
-        }
-
-        .open-button,
-        .delete-button {
-            flex: 1;
-            padding: 10px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 14px;
-        }
-
-        .open-button {
-            background: #222;
-            color: white;
-            border: none;
-        }
-
-        .delete-button {
-            background: white;
-            color: #d00;
-            border: 1px solid #ddd;
-        }
-
-        .empty {
-            text-align: center;
-            padding: 50px 20px;
-            color: #888;
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.45);
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
-        .modal-content {
-            background: white;
-            width: 100%;
-            max-width: 450px;
-            border-radius: 20px;
-            padding: 25px;
-        }
-
-        .modal-content h2 {
-            margin-top: 0;
-        }
-
-        .input {
-            width: 100%;
-            padding: 14px;
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            font-size: 16px;
-            margin-bottom: 15px;
-        }
-
-        .modal-buttons {
-            display: flex;
-            gap: 10px;
-        }
-
-        .modal-buttons button {
-            flex: 1;
-            padding: 12px;
-            border-radius: 10px;
-            cursor: pointer;
-        }
-
-        .cancel-button {
-            background: white;
-            border: 1px solid #ddd;
-        }
-
-        .confirm-button {
-            background: #222;
-            color: white;
-            border: none;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>AI工作流工坊</title>
+<style>
+* {
+    box-sizing: border-box;
+}
+html,
+body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #f3f3f3;
+}
+/* 顶部导航 */
+.topbar {
+    height: 60px;
+    background: white;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 15px;
+    position: relative;
+    z-index: 100;
+}
+.title {
+    font-size: 18px;
+    font-weight: bold;
+}
+.top-buttons {
+    display: flex;
+    gap: 8px;
+}
+.top-buttons button {
+    border: none;
+    border-radius: 8px;
+    padding: 9px 14px;
+    font-size: 14px;
+    cursor: pointer;
+}
+.save-btn {
+    background: #222;
+    color: white;
+}
+.run-btn {
+    background: #e8e8e8;
+    color: #222;
+}
+/* 主体 */
+.main {
+    display: flex;
+    width: 100%;
+    height: calc(100% - 60px);
+}
+/* 左侧节点栏 */
+.sidebar {
+    width: 180px;
+    background: white;
+    border-right: 1px solid #ddd;
+    padding: 15px;
+    z-index: 50;
+}
+.sidebar h3 {
+    margin-top: 0;
+    font-size: 16px;
+}
+.node-button {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    background: white;
+    border-radius: 10px;
+    text-align: left;
+    cursor: pointer;
+    font-size: 14px;
+}
+.node-button:active {
+    transform: scale(0.97);
+}
+/* 工作流画布 */
+.canvas {
+    position: relative;
+    flex: 1;
+    overflow: auto;
+    background-color: #f7f7f7;
+    background-image:
+        linear-gradient(#e5e5e5 1px, transparent 1px),
+        linear-gradient(90deg, #e5e5e5 1px, transparent 1px);
+    background-size: 25px 25px;
+    touch-action: none;
+}
+/* 节点 */
+.node {
+    position: absolute;
+    width: 180px;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 14px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    user-select: none;
+    touch-action: none;
+}
+.node-header {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+    font-weight: bold;
+    cursor: grab;
+}
+.node-content {
+    padding: 12px;
+    font-size: 13px;
+    color: #666;
+}
+.delete-node {
+    float: right;
+    border: none;
+    background: none;
+    color: #999;
+    cursor: pointer;
+}
+/* 节点连接点 */
+.connection {
+    width: 14px;
+    height: 14px;
+    background: #555;
+    border-radius: 50%;
+    position: absolute;
+    right: -7px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+.input-connection {
+    width: 14px;
+    height: 14px;
+    background: #555;
+    border-radius: 50%;
+    position: absolute;
+    left: -7px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+/* 空状态 */
+.empty-message {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: #999;
+    pointer-events: none;
+}
+@media (max-width: 600px) {
+    .sidebar {
+        width: 130px;
+        padding: 10px;
+    }
+    .node-button {
+        font-size: 12px;
+        padding: 10px;
+    }
+    .node {
+        width: 160px;
+    }
+}
+</style>
 </head>
-
 <body>
-
-    <div class="header">
-        <h1>🧠 AI工作流工坊</h1>
+<!-- 顶部 -->
+<div class="topbar">
+<div class="title">
+    🧠 AI工作流工坊
+</div>
+<div class="top-buttons">
+    <button
+        class="save-btn"
+        onclick="saveWorkflow()"
+    >
+        💾 保存
+    </button>
+    <button
+        class="run-btn"
+        onclick="runWorkflow()"
+    >
+        ▶️ 运行
+    </button>
+</div>
+</div>
+<!-- 主体 -->
+<div class="main">
+<!-- 节点工具栏 -->
+<div class="sidebar">
+    <h3>节点</h3>
+    <button
+        class="node-button"
+        onclick="addNode('input')"
+    >
+        📝 输入
+    </button>
+    <button
+        class="node-button"
+        onclick="addNode('ai')"
+    >
+        🤖 AI
+    </button>
+    <button
+        class="node-button"
+        onclick="addNode('image')"
+    >
+        🎨 AI生图
+    </button>
+    <button
+        class="node-button"
+        onclick="addNode('output')"
+    >
+        💾 输出
+    </button>
+</div>
+<!-- 画布 -->
+<div
+    id="canvas"
+    class="canvas"
+>
+    <div
+        id="emptyMessage"
+        class="empty-message"
+    >
+        点击左侧节点，把节点添加到工作流
     </div>
-
-    <div class="container">
-
-        <button class="create-button" onclick="openCreateModal()">
-            ＋ 创建工作流
-        </button>
-
-        <h2 class="section-title">我的工作流</h2>
-
-        <div id="workflowList" class="workflow-list">
-        </div>
-
-    </div>
-
-
-    <!-- 创建工作流弹窗 -->
-
-    <div id="createModal" class="modal">
-
-        <div class="modal-content">
-
-            <h2>创建工作流</h2>
-
-            <input
-                id="workflowName"
-                class="input"
-                type="text"
-                placeholder="请输入工作流名称"
+</div>
+</div>
+<script>
+/* 节点数据 */
+let nodes = [];
+let nodeCounter = 0;
+/* 节点类型 */
+const nodeTypes = {
+    input: {
+        title: "📝 输入节点",
+        content: "输入角色或任务信息"
+    },
+    ai: {
+        title: "🤖 AI节点",
+        content: "调用AI模型处理内容"
+    },
+    image: {
+        title: "🎨 AI生图节点",
+        content: "根据提示词生成图片"
+    },
+    output: {
+        title: "💾 输出节点",
+        content: "保存最终结果"
+    }
+};
+/* 添加节点 */
+function addNode(type) {
+    const canvas =
+        document.getElementById("canvas");
+    const emptyMessage =
+        document.getElementById("emptyMessage");
+    emptyMessage.style.display = "none";
+    const node =
+        document.createElement("div");
+    node.className = "node";
+    const id =
+        "node-" + nodeCounter++;
+    node.dataset.id = id;
+    node.style.left =
+        (100 + nodes.length * 30) + "px";
+    node.style.top =
+        (100 + nodes.length * 30) + "px";
+    node.innerHTML = `
+        <div class="node-header">
+            ${nodeTypes[type].title}
+            <button
+                class="delete-node"
+                onclick="deleteNode(this)"
             >
-
-            <input
-                id="workflowDescription"
-                class="input"
-                type="text"
-                placeholder="请输入工作流描述"
-            >
-
-            <div class="modal-buttons">
-
-                <button
-                    class="cancel-button"
-                    onclick="closeCreateModal()"
-                >
-                    取消
-                </button>
-
-                <button
-                    class="confirm-button"
-                    onclick="createWorkflow()"
-                >
-                    创建
-                </button>
-
-            </div>
-
+                ×
+            </button>
         </div>
-
-    </div>
-
-
-    <script>
-
-        // 获取已经保存的工作流
-        let workflows = JSON.parse(
-            localStorage.getItem("workflows")
-        ) || [];
-
-
-        // 显示工作流
-        function renderWorkflows() {
-
-            const list = document.getElementById("workflowList");
-
-            list.innerHTML = "";
-
-            if (workflows.length === 0) {
-
-                list.innerHTML = `
-                    <div class="empty">
-                        <p>暂无工作流</p>
-                        <p>点击上方按钮创建你的第一个工作流</p>
-                    </div>
-                `;
-
-                return;
-            }
-
-
-            workflows.forEach(function(workflow, index) {
-
-                const card = document.createElement("div");
-
-                card.className = "workflow-card";
-
-                card.innerHTML = `
-
-                    <h3>${workflow.name}</h3>
-
-                    <p>${workflow.description}</p>
-
-                    <div class="card-buttons">
-
-                        <button
-                            class="open-button"
-                            onclick="openWorkflow(${index})"
-                        >
-                            打开
-                        </button>
-
-                        <button
-                            class="delete-button"
-                            onclick="deleteWorkflow(${index})"
-                        >
-                            删除
-                        </button>
-
-                    </div>
-
-                `;
-
-                list.appendChild(card);
-
-            });
-
-        }
-
-
-        // 打开创建窗口
-        function openCreateModal() {
-
-            document.getElementById("createModal").style.display = "flex";
-
-        }
-
-
-        // 关闭创建窗口
-        function closeCreateModal() {
-
-            document.getElementById("createModal").style.display = "none";
-
-        }
-
-
-        // 创建工作流
-        function createWorkflow() {
-
-            const name =
-                document.getElementById("workflowName").value.trim();
-
-            const description =
-                document.getElementById("workflowDescription").value.trim();
-
-
-            if (name === "") {
-
-                alert("请输入工作流名称");
-
-                return;
-
-            }
-
-
-            const newWorkflow = {
-
-                name: name,
-
-                description:
-                    description || "暂无描述",
-
-                nodes: []
-
-            };
-
-
-            workflows.push(newWorkflow);
-
-
-            // 保存到浏览器
-            localStorage.setItem(
-                "workflows",
-                JSON.stringify(workflows)
+        <div class="node-content">
+            ${nodeTypes[type].content}
+        </div>
+        <div class="input-connection"></div>
+        <div class="connection"></div>
+    `;
+    canvas.appendChild(node);
+    nodes.push({
+        id: id,
+        type: type,
+        x: parseInt(node.style.left),
+        y: parseInt(node.style.top)
+    });
+    makeDraggable(node);
+}
+/* 删除节点 */
+function deleteNode(button) {
+    const node =
+        button.closest(".node");
+    const id =
+        node.dataset.id;
+    node.remove();
+    nodes =
+        nodes.filter(
+            item => item.id !== id
+        );
+    if (nodes.length === 0) {
+        document.getElementById(
+            "emptyMessage"
+        ).style.display = "block";
+    }
+}
+/* 拖动节点 */
+function makeDraggable(node) {
+    const header =
+        node.querySelector(".node-header");
+    let dragging = false;
+    let startX = 0;
+    let startY = 0;
+    let startLeft = 0;
+    let startTop = 0;
+    header.addEventListener(
+        "pointerdown",
+        function(event) {
+            dragging = true;
+            header.setPointerCapture(
+                event.pointerId
             );
-
-
-            // 清空输入框
-            document.getElementById("workflowName").value = "";
-
-            document.getElementById("workflowDescription").value = "";
-
-
-            closeCreateModal();
-
-
-            renderWorkflows();
-
+            startX =
+                event.clientX;
+            startY =
+                event.clientY;
+            startLeft =
+                parseInt(
+                    node.style.left
+                );
+            startTop =
+                parseInt(
+                    node.style.top
+                );
         }
-
-
-        // 删除工作流
-        function deleteWorkflow(index) {
-
-            const confirmDelete =
-                confirm("确定要删除这个工作流吗？");
-
-
-            if (!confirmDelete) {
-
-                return;
-
-            }
-
-
-            workflows.splice(index, 1);
-
-
-            localStorage.setItem(
-                "workflows",
-                JSON.stringify(workflows)
-            );
-
-
-            renderWorkflows();
-
+    );
+    header.addEventListener(
+        "pointermove",
+        function(event) {
+            if (!dragging) return;
+            const dx =
+                event.clientX - startX;
+            const dy =
+                event.clientY - startY;
+            node.style.left =
+                startLeft + dx + "px";
+            node.style.top =
+                startTop + dy + "px";
         }
-
-
-        // 打开工作流
-        function openWorkflow(index) {
-
-            const workflow = workflows[index];
-
-            alert(
-                "你打开了工作流：\n\n" +
-                workflow.name +
-                "\n\n下一步我们会制作工作流编辑器。"
-            );
-
+    );
+    header.addEventListener(
+        "pointerup",
+        function() {
+            dragging = false;
         }
-
-
-        // 页面加载时显示工作流
-        renderWorkflows();
-
-    </script>
-
+    );
+}
+/* 保存工作流 */
+function saveWorkflow() {
+    localStorage.setItem(
+        "aiWorkflowNodes",
+        JSON.stringify(nodes)
+    );
+    alert(
+        "工作流已保存！"
+    );
+}
+/* 运行工作流 */
+function runWorkflow() {
+    if (nodes.length === 0) {
+        alert(
+            "请先添加工作流节点。"
+        );
+        return;
+    }
+    alert(
+        "工作流开始运行！\n\n" +
+        "当前节点数量：" +
+        nodes.length +
+        "\n\n" +
+        "下一步我们将实现真正的节点连接和AI运行。"
+    );
+}
+</script>
 </body>
 </html>
